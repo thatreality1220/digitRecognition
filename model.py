@@ -7,7 +7,7 @@ import plotly.express as px
 
 X_train = (X_train / 255.0)[..., np.newaxis]
 X_test = (X_test / 255.0)[..., np.newaxis]
-
+CLASS_LABELS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
 model = keras.Sequential([
     keras.layers.Input(shape=(28, 28, 1)),
 
@@ -30,7 +30,16 @@ model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=
 history = model.fit(X_train, y_train, validation_split=0.1, epochs=5, verbose=1)
 
 test_loss, test_acc = model.evaluate(X_test, y_test, verbose=0)
-print(f"Test Accuracy: {test_acc:.2%}")
 
 def predict(data):
-    data
+    data = np.array(data)
+
+    data = (data.astype("float32") / 255.0)[..., np.newaxis]
+    data = np.expand_dims(data, axis=0)
+    predictions = model.predict(data, batch_size=None, verbose=0, steps=None, callbacks=None)
+    
+    prediction = np.argmax(predictions, axis=-1)[0]
+    predicted_digit = CLASS_LABELS[prediction]
+    confidence = predictions[0][prediction]
+
+    return predicted_digit, confidence
