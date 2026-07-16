@@ -1,9 +1,8 @@
 import tkinter as tk
 from tkinter import Tk, Canvas
 from PIL import Image, ImageGrab, ImageOps
-import model
-from model import predict
-
+from tensorflow import keras
+import numpy as np
 
 root = Tk()
 root.title("Digit Classifier!")
@@ -53,6 +52,20 @@ def model_result():
     pred_label.config(text=f"Prediction: {prediction}")
     conf_label.config(text=f"Confidence: {confidence:.2%}")
 
+def predict(data):
+    CLASS_LABELS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    model = keras.models.load_model("digit_classifier.keras")
+    data = np.array(data)
+
+    data = (data.astype("float32") / 255.0)[..., np.newaxis]
+    data = np.expand_dims(data, axis=0)
+    predictions = model.predict(data, batch_size=None, verbose=0, steps=None, callbacks=None)
+    
+    prediction = np.argmax(predictions, axis=-1)[0]
+    predicted_digit = CLASS_LABELS[prediction]
+    confidence = predictions[0][prediction]
+
+    return predicted_digit, confidence
 canvas.pack(fill=tk.BOTH, expand=True)
 eraseButton = tk.Button(root, text="Erase", width=10, command=erase_all)
 eraseButton.pack(side="bottom", anchor="sw")
