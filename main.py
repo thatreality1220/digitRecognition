@@ -13,6 +13,9 @@ brush_size = 12
 last_x = None
 last_y = None
 
+model = keras.models.load_model("digit_classifier.keras") #load our model from our saved file
+
+
 pred_label = tk.Label(root, text="")
 pred_label.pack(side="bottom", anchor="se")
 
@@ -55,7 +58,6 @@ def model_result():
     conf_label.config(text=f"Confidence: {confidence:.2%}")
 
 def predict(data):
-    model = keras.models.load_model("digit_classifier.keras") #load our model from our saved file
     data = np.array(data) # convert our screenshot into a numpy array
 
     data = (data.astype("float32") / 255.0)[..., np.newaxis]
