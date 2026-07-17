@@ -7,9 +7,9 @@ import numpy as np
 root = Tk()
 root.title("Digit Classifier!")
 root.geometry("600x600")
-canvas = Canvas(root, bg="white", highlightthickness=0) # configure our tkinter interface
+canvas = Canvas(root, bg="white", highlightthickness=0) # set up our tkinter interface
 pen_color = "black"
-brush_size = 12;
+brush_size = 12
 last_x = None
 last_y = None
 
@@ -55,7 +55,6 @@ def model_result():
     conf_label.config(text=f"Confidence: {confidence:.2%}")
 
 def predict(data):
-    CLASS_LABELS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     model = keras.models.load_model("digit_classifier.keras") #load our model from our saved file
     data = np.array(data) # convert our screenshot into a numpy array
 
@@ -63,9 +62,8 @@ def predict(data):
     data = np.expand_dims(data, axis=0) # fit the image data to give our model
     predictions = model.predict(data, batch_size=None, verbose=0, steps=None, callbacks=None) # model gives us probabilities for each digit
     
-    prediction = np.argmax(predictions, axis=-1)[0]
-    predicted_digit = CLASS_LABELS[prediction] #gives us a clear prediction based on our digits
-    confidence = predictions[0][prediction] #gives us the model's calculated probability for our predicted number
+    predicted_digit = np.argmax(predictions, axis=-1)[0] #gives us a clear prediction based on our digits
+    confidence = predictions[0][predicted_digit] #gives us the model's calculated probability for our predicted number
 
     return predicted_digit, confidence
 canvas.pack(fill=tk.BOTH, expand=True)

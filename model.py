@@ -1,6 +1,9 @@
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
+import plotly.express as px
+from sklearn.metrics import confusion_matrix
+
 
 (X_train, y_train), (X_test, y_test) = keras.datasets.mnist.load_data() # load the keras mnist dataset into a test set and training data set
 
@@ -26,9 +29,28 @@ model = keras.Sequential([
 ])
 
 model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=["accuracy"]) # configues our model's optimizer and our way of calculating loss
-history = model.fit(X_train, y_train, validation_split=0.1, epochs=5, verbose=1) # splits our dataset into 90% training data and 10% testing data
+early_stopping = keras.callbacks.EarlyStopping(
+    monitor="val_loss",
+    patience=5,
+    restore_best_weights=True
+) #stops training our model when the accuracy doesn't decrease for 5 iterations
+history = model.fit(X_train, y_train, validation_split=0.1, epochs=20, verbose=1, callbacks=[early_stopping]) # splits our dataset into 90% training data and 10% testing data
 #and adjusts how many iterations we train our model for
 
+y_pred = model.predict(X_test).argmax(axis=1)
+cm = confusion_matrix(y_test, y_pred)
+class_names = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+fig = px.imshow(cm,
+                x=class_names,
+                y=class_names,
+                text_auto=True,
+                color_continuous_scale="Blues",
+                labels=dict(x="Predicted",
+                            y="Actual",
+                            color="Count",
+                            title="Confusion Matrix"))
 
+fig.show()
+#Draws a confusion matrix that shows what the model gets wrong
 model.save("digit_classifier.keras")
 # saves our trained model into a seperate .keras file
